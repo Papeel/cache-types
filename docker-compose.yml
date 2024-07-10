@@ -1,0 +1,33 @@
+services:
+  cache_varnish:
+    image: varnish:7.4
+    ports:
+      - "80:80"
+    volumes:
+      - ./etc/varnish:/etc/varnish:ro
+    command: varnishd -F -f /etc/varnish/default.vcl -s malloc,256m
+
+  cache_redis:
+    image: redis:7.2
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  cache_mariadb:
+    image: mariadb:11
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: my_project
+      MYSQL_USER: juan
+      MYSQL_PASSWORD: password
+      TZ: UTC
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./databases/init.sql:/docker-entrypoint-initdb.d/init.sql
+volumes:
+  db_data:
+  redis_data:

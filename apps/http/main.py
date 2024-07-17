@@ -24,13 +24,11 @@ async def header_cache_control(response: Response):
 @app.get("/api/v1/browser-cache/eTag")
 async def header_cache_control_with_etag(response: Response, request: Request):
     etag = str(datetime.now(timezone.utc).minute)
-    print(request.headers.get("If-None-Match"))
-
-    print(etag)
     if request.headers.get("If-None-Match") == etag:
         response.status_code = 304
         return
     await sleep(3)
+    response.headers["ETag"] = etag
     return {"message": "Sorry for the delay"}
 
 
